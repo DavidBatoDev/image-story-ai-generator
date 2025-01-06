@@ -1,12 +1,11 @@
 from dotenv import find_dotenv, load_dotenv
 from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer
+from gtts import gTTS
+import torch
 import os
 
 # Load environment variables
 load_dotenv(find_dotenv())
-
-# Access token from .env
-HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 
 # Image-to-Text Function
 def img2text(url):
@@ -29,6 +28,7 @@ def img2text(url):
 def load_story_generator():
     tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
     model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
+    model.config.pad_token_id = model.config.eos_token_id  # Set pad_token_id
     generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
     return generator
 
@@ -36,11 +36,26 @@ def load_story_generator():
 def generate_story(prompt, generator):
     try:
         # Generate story from the prompt
-        story = generator(prompt, max_length=200, num_return_sequences=1)
+        story = generator(prompt, max_length=200, num_return_sequences=1, truncation=True)
         print("Generated Story:", story[0]["generated_text"])
         return story[0]["generated_text"]
     except Exception as e:
         print("Error during story generation:", str(e))
+        return None
+
+# Text-to-Speech using gTTS
+def text_to_speech(text, description=None):
+    try:
+        # Create TTS from text
+        tts = gTTS(text, lang='en')
+        output_file = f"output_audio_{description or 'story'}.mp3"
+
+        # Save the audio file
+        tts.save(output_file)
+        print(f"Audio file saved as: {output_file}")
+        return output_file
+    except Exception as e:
+        print("Error during text-to-speech conversion:", str(e))
         return None
 
 # Main Functionality
@@ -56,3 +71,10 @@ if __name__ == "__main__":
 
         if story:
             print("\nFinal Story Output:\n", story)
+
+            # Step 3: Convert Generated Story to Speech
+            print("\nConverting story to speech...")
+            audio_file = text_to_speech(story)
+
+            if audio_file:
+                print("\nText-to-Speech conversion complete. Audio saved at:", audio_file)
