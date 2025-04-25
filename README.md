@@ -36,7 +36,7 @@ Set up your .env file for environment variables (if required).
 ### Installation
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/ai-story-generator.git
+git clone https://github.com/you/DavidBatoDev/image-story-ai-generator.git
 cd ai-story-generator
 ```
 2. Set up a virtual environment (recommended):
