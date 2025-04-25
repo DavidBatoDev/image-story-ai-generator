@@ -65,7 +65,7 @@ st.sidebar.header("Upload Image")
 image_file = st.sidebar.file_uploader("Upload an image file (JPEG/PNG):", type=["jpg", "png"])
 
 if image_file is not None:
-    st.image(image_file, caption="Uploaded Image", use_column_width=True)
+    st.image(image_file, caption="Uploaded Image", use_container_width=True)
     temp_file_path = f"temp_{image_file.name}"
     with open(temp_file_path, "wb") as f:
         f.write(image_file.getbuffer())
